@@ -86,6 +86,9 @@ namespace Test
             try
             {
                 routine(device);
+
+                var sleepTimeForThreadsToStartAndProcessPackets = new TimeSpan(0, 0, 5);
+                Thread.Sleep(sleepTimeForThreadsToStartAndProcessPackets);
             }
             finally
             {
