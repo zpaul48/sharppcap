@@ -16,7 +16,15 @@ jobs:
 
   steps:
   - script: |
-      sudo apt-get install -y libpcap-dev
+      sudo apt-get install -y gcc flex bison wget
+  - script: |
+      wget https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz
+      tar xvzf libpcap-1.9.1.tar.gz
+      cd libpcap-libpcap-1.9.1
+      ./configure --prefix=/usr
+      make
+      sudo make install
+    displayName: Build and install libpcap
   - script: |
       set -e
       sudo dotnet test -f netcoreapp2.1 Test/Test.csproj --configuration $(buildConfiguration) --logger trx --filter TestCategory!=Performance
