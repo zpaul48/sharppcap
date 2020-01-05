@@ -67,7 +67,7 @@ namespace SharpPcap.LibPcap
         /// <summary>
         /// Flag that indicates that a capture thread should stop
         /// </summary>
-        protected bool shouldCaptureThreadStop;
+        protected static CancellationTokenSource threadCancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
         /// If Environment.OSVersion.Platform is unix and MonoUnixFound is true
@@ -181,9 +181,9 @@ namespace SharpPcap.LibPcap
                 if (OnPacketArrival == null)
                     throw new DeviceNotReadyException("No delegates assigned to OnPacketArrival, no where for captured packets to go.");
 
-                shouldCaptureThreadStop = false;
-                captureThread = new Thread(new ThreadStart(this.CaptureThread));
-                captureThread.Start();
+                var cancellationToken = threadCancellationTokenSource.Token;
+                captureThread = new Thread(new ParameterizedThreadStart(this.CaptureThread));
+                captureThread.Start(cancellationToken);
             }
         }
 
@@ -197,7 +197,7 @@ namespace SharpPcap.LibPcap
         {
             if (Started)
             {
-                shouldCaptureThreadStop = true;
+                threadCancellationTokenSource.Cancel();
                 LibPcapSafeNativeMethods.pcap_breakloop(PcapHandle);
                 if (!captureThread.Join(StopCaptureTimeout))
                 {
@@ -241,16 +241,25 @@ namespace SharpPcap.LibPcap
         public void Capture(int packetCount)
         {
             m_pcapPacketCount = packetCount;
-            CaptureThread();
+            CaptureThread(threadCancellationTokenSource.Token);
 
             // restore the capture count incase the user Starts
             m_pcapPacketCount = Pcap.InfinitePacketCount;
         }
 
         /// <summary>
+        /// Call through to the CaptureThread method with a specific type
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        protected virtual void CaptureThread(object cancellationToken)
+        {
+            CaptureThread((CancellationToken)cancellationToken);
+        }
+
+        /// <summary>
         /// The capture thread
         /// </summary>
-        protected virtual void CaptureThread()
+        protected virtual void CaptureThread(CancellationToken cancellationToken)
         {
             if (!Opened)
                 throw new DeviceNotReadyException("Capture called before PcapDevice.Open()");
@@ -317,7 +326,7 @@ namespace SharpPcap.LibPcap
 #endif
             }
 
-            while (!shouldCaptureThreadStop)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 // unix specific code, we want to poll for packets
                 // otherwise if we call pcap_dispatch() the read() will block
