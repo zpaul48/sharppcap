@@ -200,7 +200,6 @@ namespace SharpPcap.LibPcap
                 shouldCaptureThreadStop = true;
                 if (!captureThread.Join(StopCaptureTimeout))
                 {
-                    captureThread.Abort();
                     captureThread = null;
                     string error;
 
