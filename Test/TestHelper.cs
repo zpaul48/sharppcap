@@ -96,11 +96,14 @@ namespace Test
                         Console.WriteLine($"Received: {packet} after {sw.Elapsed} (at {raw.Timeval})");
                         received.Add(raw);
                     }
-                    else if (sw.ElapsedMilliseconds > 20000)
+                    else
                     {
                         Console.WriteLine($"Received: null packet after {sw.Elapsed})");
-                        // No more packets in queue, and 2 seconds has passed
-                        break;
+                        if (sw.ElapsedMilliseconds > 20000)
+                        {
+                            // No more packets in queue, and 2 seconds has passed
+                            break;
+                        }
                     }
 
                 }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static Test.TestHelper;
 using static System.TimeSpan;
+using System.Net.NetworkInformation;
 
 namespace Test
 {
@@ -29,7 +30,8 @@ namespace Test
                     GetSendQueue().NativeTransmit(device, false);
                 });
                 AssertGoodTransmitNormal(received);
-            } else
+            }
+            else
             {
                 Assert.Ignore("Skipping test as no hardware acceleration is present");
             }
@@ -45,7 +47,8 @@ namespace Test
                     GetSendQueue().NativeTransmit(device, true);
                 });
                 AssertGoodTransmitSync(received);
-            } else
+            }
+            else
             {
                 Assert.Ignore("Skipping test as no hardware acceleration is present");
             }
@@ -101,7 +104,8 @@ namespace Test
                 {
                     device.Close();
                 }
-            } else
+            }
+            else
             {
                 Assert.Ignore("Skipping test as no hardware acceleration is present");
             }
@@ -127,6 +131,8 @@ namespace Test
             packet.Type = (EthernetType)0x1234;
             for (var i = 0; i < PacketCount; i++)
             {
+                var dst = new PhysicalAddress(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, (byte)i });
+                packet.DestinationHardwareAddress = dst;
                 Assert.IsTrue(queue.Add(packet.Bytes, 123456, i * DeltaMs * 1000));
             }
             return queue;
