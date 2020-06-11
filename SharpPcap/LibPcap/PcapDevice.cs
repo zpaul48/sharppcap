@@ -113,9 +113,15 @@ namespace SharpPcap.LibPcap
         }
 
         /// <summary>
+        /// The file descriptor obtained from pcap_fileno
+        /// Used for polling
+        /// </summary>
+        protected internal int FileDescriptor = -1;
+
+        /// <summary>
         /// The underlying pcap device handle
         /// </summary>
-        internal virtual IntPtr PcapHandle
+        internal IntPtr PcapHandle
         {
             get { return m_pcapAdapterHandle; }
             set
@@ -397,9 +403,15 @@ namespace SharpPcap.LibPcap
                 throw new InvalidOperationDuringBackgroundCaptureException("GetNextPacket() invalid during background capture");
             }
 
+            p = null;
+
+            if (!PollFileDescriptor())
+            {
+                // We checked, there is no data using poll()
+                return 0;
+            }
             //Get a packet from npcap
             res = LibPcapSafeNativeMethods.pcap_next_ex(PcapHandle, ref header, ref data);
-            p = null;
 
             if (res > 0)
             {

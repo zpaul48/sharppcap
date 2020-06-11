@@ -79,9 +79,12 @@ namespace Test
             var received = new List<RawCapture>();
             device.Open(DeviceMode.Normal, 1);
             device.Filter = filter;
+            // We can't use the same device for capturing and sending
+            var sender = new LibPcapLiveDevice(device.Interface);
+            sender.Open();
             try
             {
-                routine(device);
+                routine(sender);
                 // waiting for any queued packets to be sent
                 Thread.Sleep(10);
                 while (true)
@@ -96,6 +99,7 @@ namespace Test
             }
             finally
             {
+                sender.Close();
                 device.Close();
             }
             return received;
