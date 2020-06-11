@@ -86,7 +86,7 @@ namespace Test
             {
                 routine(sender);
                 // waiting for any queued packets to be sent
-                Thread.Sleep(10);
+                Thread.Sleep(1000);
                 while (true)
                 {
                     var packet = device.GetNextPacket();
