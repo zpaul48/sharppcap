@@ -271,7 +271,7 @@ namespace SharpPcap.LibPcap
                 }
                 Active = true;
                 var platform = Environment.OSVersion.Platform;
-                if (platform == PlatformID.Unix || platform == PlatformID.MacOSX)
+                if (platform == PlatformID.Unix)
                 {
                     // retrieve the file descriptor of the adapter for use with poll()
                     FileDescriptor = LibPcapSafeNativeMethods.pcap_fileno(PcapHandle);
