@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
+using System.Diagnostics;
 
 namespace Test
 {
@@ -79,22 +80,26 @@ namespace Test
             var received = new List<RawCapture>();
             device.Open(DeviceMode.Normal, 1);
             device.Filter = filter;
-            // We can't use the same device for capturing and sending
+            // We can't use the same device for capturing and sending in Linux
             var sender = new LibPcapLiveDevice(device.Interface);
             sender.Open();
             try
             {
                 routine(sender);
-                // waiting for any queued packets to be sent
-                Thread.Sleep(1000);
+                var sw = Stopwatch.StartNew();
                 while (true)
                 {
                     var packet = device.GetNextPacket();
-                    if (packet == null)
+                    if (packet != null)
                     {
+                        received.Add(packet);
+                    }
+                    else if (sw.ElapsedMilliseconds > 2000)
+                    {
+                        // No more packets in queue, and 2 seconds has passed
                         break;
                     }
-                    received.Add(packet);
+
                 }
             }
             finally
