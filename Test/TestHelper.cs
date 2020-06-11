@@ -89,13 +89,16 @@ namespace Test
                 var sw = Stopwatch.StartNew();
                 while (true)
                 {
-                    var packet = device.GetNextPacket();
-                    if (packet != null)
+                    var raw = device.GetNextPacket();
+                    if (raw != null)
                     {
-                        received.Add(packet);
+                        var packet = Packet.ParsePacket(raw.LinkLayerType, raw.Data);
+                        Console.WriteLine($"Received: {packet} after {sw.Elapsed} (at {raw.Timeval})");
+                        received.Add(raw);
                     }
-                    else if (sw.ElapsedMilliseconds > 2000)
+                    else if (sw.ElapsedMilliseconds > 20000)
                     {
+                        Console.WriteLine($"Received: null packet after {sw.Elapsed})");
                         // No more packets in queue, and 2 seconds has passed
                         break;
                     }
