@@ -78,11 +78,11 @@ namespace Test
             var device = GetPcapDevice();
             Console.WriteLine($"Using device {device}");
             var received = new List<RawCapture>();
-            device.Open(DeviceMode.Normal, 1000);
+            device.Open(DeviceMode.Promiscuous, 1000);
             device.Filter = filter;
             // We can't use the same device for capturing and sending in Linux
             var sender = new LibPcapLiveDevice(device.Interface);
-            sender.Open();
+            sender.Open(DeviceMode.Promiscuous, 1000);
             try
             {
                 routine(device);
