@@ -133,6 +133,7 @@ namespace Test
             {
                 var dst = new PhysicalAddress(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, (byte)i });
                 packet.DestinationHardwareAddress = dst;
+                packet.PayloadData = new byte[100];
                 Assert.IsTrue(queue.Add(packet.Bytes, 123456, i * DeltaMs * 1000));
             }
             return queue;
