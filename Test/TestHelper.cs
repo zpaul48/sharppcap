@@ -81,8 +81,8 @@ namespace Test
             device.Open(DeviceMode.Promiscuous, 1000);
             device.Filter = filter;
             // We can't use the same device for capturing and sending in Linux
-            var sender = new LibPcapLiveDevice(device.Interface);
-            sender.Open(DeviceMode.Promiscuous, 1000);
+            // var sender = new LibPcapLiveDevice(device.Interface);
+            // sender.Open(DeviceMode.Promiscuous, 1000);
             try
             {
                 routine(device);
@@ -107,6 +107,7 @@ namespace Test
                     }
 
                 }
+                /*
                 while (true)
                 {
                     var raw = sender.GetNextPacket();
@@ -126,12 +127,13 @@ namespace Test
                     }
 
                 }
+                */
                 Console.WriteLine(device.Statistics);
-                Console.WriteLine(sender.Statistics);
+                // Console.WriteLine(sender.Statistics);
             }
             finally
             {
-                sender.Close();
+                // sender.Close();
                 device.Close();
             }
             return received;
