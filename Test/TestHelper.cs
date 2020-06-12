@@ -107,6 +107,27 @@ namespace Test
                     }
 
                 }
+                while (true)
+                {
+                    var raw = sender.GetNextPacket();
+                    if (raw != null)
+                    {
+                        var packet = Packet.ParsePacket(raw.LinkLayerType, raw.Data);
+                        Console.WriteLine($"Sent: {packet} after {sw.Elapsed} (at {raw.Timeval})");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Sent: null packet after {sw.Elapsed})");
+                        if (sw.ElapsedMilliseconds > 20000)
+                        {
+                            // No more packets in queue, and 2 seconds has passed
+                            break;
+                        }
+                    }
+
+                }
+                Console.WriteLine(device.Statistics);
+                Console.WriteLine(sender.Statistics);
             }
             finally
             {
