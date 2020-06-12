@@ -85,7 +85,7 @@ namespace Test
             sender.Open();
             try
             {
-                routine(sender);
+                routine(device);
                 var sw = Stopwatch.StartNew();
                 while (true)
                 {
