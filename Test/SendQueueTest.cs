@@ -126,7 +126,7 @@ namespace Test
         /// <returns></returns>
         private static SendQueueWrapper GetSendQueue()
         {
-            var queue = new SendQueueWrapper(1024);
+            var queue = new SendQueueWrapper(4096);
             var packet = EthernetPacket.RandomPacket();
             packet.Type = (EthernetType)0x1234;
             for (var i = 0; i < PacketCount; i++)
