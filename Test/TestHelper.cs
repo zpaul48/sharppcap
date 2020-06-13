@@ -80,11 +80,11 @@ namespace Test
             var received = new List<RawCapture>();
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                device.Open(DeviceMode.Promiscuous, 1000);
+                device.Open(DeviceMode.Promiscuous, 1);
             }
             else
             {
-                device.Open(DeviceMode.Normal, 1000);
+                device.Open(DeviceMode.Normal, 1);
             }
             device.Filter = filter;
             // We can't use the same device for capturing and sending in Linux
