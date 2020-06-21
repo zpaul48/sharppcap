@@ -20,6 +20,7 @@ along with SharpPcap.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace SharpPcap.LibPcap
@@ -121,7 +122,8 @@ namespace SharpPcap.LibPcap
         /// <summary>
         /// The underlying pcap device handle
         /// </summary>
-        internal IntPtr PcapHandle
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public IntPtr PcapHandle
         {
             get { return m_pcapAdapterHandle; }
             set
@@ -295,7 +297,11 @@ namespace SharpPcap.LibPcap
 
             if (Started)
             {
-                StopCapture();
+                try
+                {
+                    StopCapture();
+                }
+                catch (Exception) { }
             }
             LibPcapSafeNativeMethods.pcap_close(PcapHandle);
             PcapHandle = IntPtr.Zero;
@@ -535,7 +541,8 @@ namespace SharpPcap.LibPcap
 
         // If CompileFilter() returns true bpfProgram must be freed by passing it to FreeBpfProgram()
         /// or unmanaged memory will be leaked
-        private static bool CompileFilter(IntPtr pcapHandle,
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static bool CompileFilter(IntPtr pcapHandle,
                                           string filterExpression,
                                           uint mask,
                                           out IntPtr bpfProgram,
@@ -575,12 +582,25 @@ namespace SharpPcap.LibPcap
         }
 
         /// <summary>
+        /// Runs the program and returns if a given filter applies to an offline packet
+        /// </summary>
+        /// <param name="bpfProgram">
+        /// A <see cref="IntPtr"/>
+        /// </param>
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static bool RunBpfProgram(IntPtr bpfProgram, IntPtr header, IntPtr data)
+        {
+            return LibPcapSafeNativeMethods.pcap_offline_filter(bpfProgram, header, data);
+        }
+
+        /// <summary>
         /// Free memory allocated in CompileFilter()
         /// </summary>
         /// <param name="bpfProgram">
         /// A <see cref="IntPtr"/>
         /// </param>
-        private static void FreeBpfProgram(IntPtr bpfProgram)
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static void FreeBpfProgram(IntPtr bpfProgram)
         {
             // free any pcap internally allocated memory from pcap_compile()
             LibPcapSafeNativeMethods.pcap_freecode(bpfProgram);
