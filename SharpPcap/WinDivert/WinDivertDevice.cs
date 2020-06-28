@@ -191,8 +191,27 @@ namespace SharpPcap.WinDivert
 
         public void SendPacket(ReadOnlySpan<byte> p)
         {
-            // TODO
-            throw new NotSupportedException();
+            ThrowIfNotOpen();
+            bool res;
+            unsafe
+            {
+                fixed (byte* p_packet = p)
+                {
+                    res = WinDivertNative.WinDivertSend(Handle, new IntPtr(p_packet), (uint)p.Length, out var pSendLen, ref DstAddress);
+                }
+            }
+            if (!res)
+            {
+                ThrowLastWin32Error("Can't send packet");
+            }
+        }
+
+        private WinDivertAddress DstAddress = default;
+        public void SetSendPacketDestination(bool outbound, uint interfaceIndex, uint subInterfaceIndex)
+        {
+            DstAddress.Flags = (byte)((DstAddress.Flags & 0xFD) | (outbound ? 2 : 0));
+            DstAddress.IfIdx = interfaceIndex;
+            DstAddress.SubIfIdx = subInterfaceIndex;
         }
 
         public bool Started => captureThread?.IsAlive ?? false;
