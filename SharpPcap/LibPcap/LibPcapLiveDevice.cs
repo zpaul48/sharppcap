@@ -274,7 +274,7 @@ namespace SharpPcap.LibPcap
                 if (platform == PlatformID.Unix)
                 {
                     // retrieve the file descriptor of the adapter for use with poll()
-                    FileDescriptor = LibPcapSafeNativeMethods.pcap_fileno(PcapHandle);
+                    FileDescriptor = LibPcapSafeNativeMethods.pcap_get_selectable_fd(PcapHandle);
                 }
             }
         }
