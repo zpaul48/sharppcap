@@ -118,6 +118,7 @@ namespace SharpPcap.LibPcap
                 address = addr.Next; // move to the next address
             }
             
+            //new
             if (networkInterface != null)
             {
                 var ipProperties = networkInterface.GetIPProperties();
